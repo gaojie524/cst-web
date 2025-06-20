@@ -1,0 +1,15 @@
+{
+  "name": "views",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "vue-cli-service build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitcode.com/yangzongzhuan/RuoYi-Vue3.git"
+  },
+  "private": true
+}
