@@ -142,7 +142,7 @@
                      <el-input v-model="form.menuName" placeholder="请输入菜单名称" />
                   </el-form-item>
                </el-col>
-               <el-col :span="12" v-if="form.menuType == 'C'">
+               <el-col :span="12" >
                   <el-form-item prop="routeName">
                      <template #label>
                         <span>
@@ -183,7 +183,7 @@
                      <el-input v-model="form.path" placeholder="请输入路由地址" />
                   </el-form-item>
                </el-col>
-               <el-col :span="12" v-if="form.menuType == 'C'">
+               <el-col :span="12" >
                   <el-form-item prop="component">
                      <template #label>
                         <span>
@@ -209,7 +209,7 @@
                      </template>
                   </el-form-item>
                </el-col>
-               <el-col :span="12" v-if="form.menuType == 'C'">
+               <el-col :span="12" >
                   <el-form-item>
                      <el-input v-model="form.query" placeholder="请输入路由参数" maxlength="255" />
                      <template #label>
@@ -222,7 +222,7 @@
                      </template>
                   </el-form-item>
                </el-col>
-               <el-col :span="12" v-if="form.menuType == 'C'">
+               <el-col :span="12" >
                   <el-form-item>
                      <template #label>
                         <span>
