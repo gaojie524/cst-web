@@ -22,7 +22,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="物料类别" prop="itemCategory">
-        <el-select v-model="queryParams.itemCategory" placeholder="请选择物料类别" clearable style="width: 150px">
+        <el-select v-model="queryParams.itemnpmCategory" placeholder="请选择物料类别" clearable style="width: 150px">
           <el-option
               v-for="dict in item_category"
               :key="dict.value"

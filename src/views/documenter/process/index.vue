@@ -69,7 +69,7 @@
 
     <el-table v-loading="loading" :data="processList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="工序编号" align="center" prop="processCode" width="120"/>
+      <el-table-column label="工序编号" align="center" prop="processCode" width="150"/>
       <el-table-column label="工序名称" align="center" prop="processName" />
       <el-table-column label="工序描述" align="center" prop="processDesc" />
       <el-table-column label="工序状态" align="center" prop="processStatus">
