@@ -1,6 +1,14 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="单位编号" prop="unitCode">
+        <el-input
+            v-model="queryParams.unitCode"
+            placeholder="请输入单位编号"
+            clearable
+            @keyup.enter="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="单位名称" prop="unitName">
         <el-input
           v-model="queryParams.unitName"
@@ -60,7 +68,7 @@
 
     <el-table v-loading="loading" :data="unitList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="单位编码" align="center" prop="unitCode" width="150"/>
+      <el-table-column label="单位编号" align="center" prop="unitCode" width="150"/>
       <el-table-column label="单位名称" align="center" prop="unitName" />
       <el-table-column label="单位描述" align="center" prop="unitDescription" />
       <el-table-column label="备注1" align="center" prop="remark1" />
@@ -102,47 +110,51 @@
       <el-form ref="unitRef" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
+            <el-form-item label="单位编号" prop="unitCode">
+              <el-input v-model="form.unitCode" placeholder="请输入单位编号" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="单位名称" prop="unitName">
               <el-input v-model="form.unitName" placeholder="请输入单位名称" />
             </el-form-item>
           </el-col>
+        </el-row>
+
+        <el-row>
           <el-col :span="12">
             <el-form-item label="单位描述" prop="unitDescription">
               <el-input v-model="form.unitDescription" placeholder="请输入单位描述" />
             </el-form-item>
           </el-col>
-        </el-row>
-
-        <el-row>
           <el-col :span="12">
             <el-form-item label="备注1" prop="remark1">
               <el-input v-model="form.remark1" placeholder="请输入备注1" />
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="12">
-            <el-form-item label="备注2" prop="remark2">
-              <el-input v-model="form.remark2" placeholder="请输入备注2" />
+            <el-form-item label="备注2" prop="remark3">
+              <el-input v-model="form.remark2" placeholder="请输入备注3" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备注3" prop="remark4">
+              <el-input v-model="form.remark3" placeholder="请输入备注4" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="12">
-            <el-form-item label="备注3" prop="remark3">
-              <el-input v-model="form.remark3" placeholder="请输入备注3" />
+            <el-form-item label="备注4" prop="remark5">
+              <el-input v-model="form.remark4" placeholder="请输入备注5" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="备注4" prop="remark4">
-              <el-input v-model="form.remark4" placeholder="请输入备注4" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="备注5" prop="remark5">
-              <el-input v-model="form.remark5" placeholder="请输入备注5" />
+            <el-form-item label="备注5" prop="remark2">
+              <el-input v-model="form.remark5" placeholder="请输入备注2" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -188,7 +200,7 @@ const data = reactive({
   },
   rules: {
     unitCode: [
-      { required: true, message: "单位编码不能为空", trigger: "blur" }
+      { required: true, message: "单位编号不能为空", trigger: "blur" }
     ],
     unitName: [
       { required: true, message: "单位名称不能为空", trigger: "blur" }

@@ -9,8 +9,8 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="物料单位" prop="itemUnit" >
-        <el-select v-model="queryParams.itemUnit" placeholder="请选择物料单位" clearable style="width: 150px">
+      <el-form-item label="物料单位" prop="unitId" >
+        <el-select v-model="queryParams.unitId" placeholder="请选择物料单位" clearable style="width: 150px">
           <el-option
             v-for="dict in item_unit"
             :key="dict.value"
@@ -96,9 +96,9 @@
         </template>
       </el-table-column>
       <el-table-column label="物料名称" align="center" prop="itemName" />
-      <el-table-column label="物料单位" align="center" prop="itemUnit">
+      <el-table-column label="物料单位" align="center" prop="unitId">
         <template #default="scope">
-          <dict-tag :options="item_unit" :value="scope.row.itemUnit"/>
+          <dict-tag :options="item_unit" :value="scope.row.unitId"/>
         </template>
       </el-table-column>
       <el-table-column label="物料类别" align="center" prop="itemCategory">
@@ -160,8 +160,8 @@
         <el-form-item label="物料名称" prop="itemName">
           <el-input v-model="form.itemName" placeholder="请输入物料名称" />
         </el-form-item>
-        <el-form-item label="物料单位" prop="itemUnit">
-          <el-select v-model="form.itemUnit" placeholder="请选择物料单位">
+        <el-form-item label="物料单位" prop="unitId">
+          <el-select v-model="form.unitId" placeholder="请选择物料单位">
             <el-option
               v-for="dict in item_unit"
               :key="dict.value"
@@ -262,7 +262,7 @@ const data = reactive({
     pageSize: 10,
     itemCode: null,
     itemName: null,
-    itemUnit: null,
+    unitId: null,
     itemCategory: null,
     itemStatus: null,
     creationMethod: null,
@@ -274,7 +274,7 @@ const data = reactive({
     itemName: [
       { required: true, message: "物料名称不能为空", trigger: "blur" }
     ],
-    itemUnit: [
+    unitId: [
       { required: true, message: "物料单位不能为空", trigger: "change" }
     ],
     itemCategory: [
@@ -330,7 +330,7 @@ function reset() {
     itemId: null,
     itemCode: null,
     itemName: null,
-    itemUnit: null,
+    unitId: null,
     itemCategory: null,
     itemStatus: null,
     creationMethod: null,

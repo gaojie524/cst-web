@@ -11,14 +11,9 @@
         />
       </el-form-item>
 
-      <el-form-item label="物料单位" prop="itemUnit">
-        <el-select v-model="queryParams.itemUnit" placeholder="请选择物料单位" clearable style="width: 150px">
-          <el-option
-              v-for="dict in item_unit"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-          />
+      <el-form-item label="物料单位" prop="unitId">
+        <el-select v-model="queryParams.unitId" placeholder="请选择物料单位" clearable style="width: 150px" filterable>
+          <el-option v-for="item in unitOptions" :key="item.unitId" :label="item.unitCode" :value="item.unitId"/>
         </el-select>
       </el-form-item>
       <el-form-item label="物料类别" prop="itemCategory">
@@ -78,6 +73,9 @@
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
+        <el-button type="info" plain icon="Upload" @click="handleImport" v-hasPermi="['system:user:import']">导入</el-button>
+      </el-col>
+      <el-col :span="1.5">
         <el-button
             type="warning"
             plain
@@ -93,9 +91,9 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="物料编号" align="center" prop="itemCode" width="200"/>
       <el-table-column label="物料名称" align="center" prop="itemName" />
-      <el-table-column label="物料单位" align="center" prop="itemUnit">
+      <el-table-column label="物料单位" align="center" prop="unitId">
         <template #default="scope">
-          <dict-tag :options="item_unit" :value="scope.row.itemUnit"/>
+          <span>{{ getUnitCode(scope.row.unitId) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="物料类别" align="center" prop="itemCategory">
@@ -158,14 +156,9 @@
           </el-col>
 
           <el-col :span="12">
-            <el-form-item label="物料单位" prop="itemUnit">
-              <el-select v-model="form.itemUnit" placeholder="请选择物料单位">
-                <el-option
-                    v-for="dict in item_unit"
-                    :key="dict.value"
-                    :label="dict.label"
-                    :value="dict.value"
-                ></el-option>
+            <el-form-item label="物料单位" prop="unitId">
+              <el-select v-model="form.unitId" placeholder="请选择物料单位" filterable>
+                <el-option v-for="item in unitOptions" :key="item.unitId" :label="item.unitCode" :value="item.unitId"/>
               </el-select>
             </el-form-item>
           </el-col>
@@ -241,14 +234,38 @@
         </div>
       </template>
     </el-dialog>
+    <!-- 物料导入对话框 -->
+    <el-dialog :title="upload.title" v-model="upload.open" width="400px" append-to-body>
+      <el-upload ref="uploadRef" :limit="1" accept=".xlsx, .xls" :headers="upload.headers" :action="upload.url + '?updateSupport=' + upload.updateSupport" :disabled="upload.isUploading" :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess" :auto-upload="false" drag>
+        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <template #tip>
+          <div class="el-upload__tip text-center">
+            <div class="el-upload__tip">
+              <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的物料数据
+            </div>
+            <span>仅允许导入xls、xlsx格式文件。</span>
+            <el-link type="primary" :underline="false" style="font-size: 12px; vertical-align: baseline" @click="importTemplate">下载模板</el-link>
+          </div>
+        </template>
+      </el-upload>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitFileForm">确 定</el-button>
+          <el-button @click="upload.open = false">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Item">
 import { listItem, getItem, delItem, addItem, updateItem } from "@/api/documenter/item"
+import { listUnit } from "@/api/documenter/unit"
+import { getToken } from "@/utils/auth"
 
 const { proxy } = getCurrentInstance()
-const { item_category, item_unit, item_status,creation_method } = proxy.useDict('item_category', 'item_unit', 'item_status','creation_method')
+const { item_category, item_status,creation_method } = proxy.useDict('item_category', 'item_status','creation_method')
 
 const itemList = ref([])
 const open = ref(false)
@@ -259,14 +276,29 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
-
+const unitOptions = ref([])
+/*** 物料导入参数 */
+const upload = reactive({
+  // 是否显示弹出层（物料导入）
+  open: false,
+  // 弹出层标题（物料导入）
+  title: "",
+  // 是否禁用上传
+  isUploading: false,
+  // 是否更新已经存在的物料数据
+  updateSupport: 0,
+  // 设置上传的请求头部
+  headers: { Authorization: "Bearer " + getToken() },
+  // 上传的地址
+  url: import.meta.env.VITE_APP_BASE_API + "/documenter/item/importData"
+})
 const data = reactive({
   form: {},
   queryParams: {
     pageNum: 1,
     pageSize: 10,
     itemName: null,
-    itemUnit: null,
+    unitId: null,
     itemCategory: null,
     itemStatus: null,
     creationMethod:null,
@@ -275,7 +307,7 @@ const data = reactive({
     itemName: [
       { required: true, message: "物料名称不能为空", trigger: "blur" }
     ],
-    itemUnit: [
+    unitId: [
       { required: true, message: "物料单位不能为空", trigger: "change" }
     ],
     itemCategory: [
@@ -314,7 +346,7 @@ function reset() {
     itemId: null,
     itemCode: null,
     itemName: null,
-    itemUnit: null,
+    unitId: null,
     itemCategory: null,
     itemStatus: null,
     creationMethod: null,
@@ -412,5 +444,46 @@ function handleExport() {
   }, `item_${new Date().getTime()}.xlsx`)
 }
 
+/** 查询单位列表 */
+function getUnitOptions() {
+  listUnit().then(response => {
+    unitOptions.value = response.rows
+  })
+}
+/** 转义单位列表 */
+function getUnitCode(value) {
+  const unit = unitOptions.value.find(option => {return option.unitId == value;});
+  return unit ? unit.unitCode : value;
+}
+/** 导入按钮操作 */
+function handleImport() {
+  upload.title = "物料导入"
+  upload.open = true
+}
+/** 下载模板操作 */
+function importTemplate() {
+  proxy.download("documenter/item/importTemplate", {
+  }, `item_template_${new Date().getTime()}.xlsx`)
+}
+
+/**文件上传中处理 */
+const handleFileUploadProgress = (event, file, fileList) => {
+  upload.isUploading = true
+}
+
+/** 文件上传成功处理 */
+const handleFileSuccess = (response, file, fileList) => {
+  upload.open = false
+  upload.isUploading = false
+  proxy.$refs["uploadRef"].handleRemove(file)
+  proxy.$alert("<div style='overflow: auto;overflow-x: hidden;max-height: 70vh;padding: 10px 20px 0;'>" + response.msg + "</div>", "导入结果", { dangerouslyUseHTMLString: true })
+  getList()
+}
+
+/** 提交上传文件 */
+function submitFileForm() {
+  proxy.$refs["uploadRef"].submit()
+}
 getList()
+getUnitOptions()
 </script>

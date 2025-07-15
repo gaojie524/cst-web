@@ -59,7 +59,7 @@
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
-      <span>Copyright © 2024-2025 zhicao All Rights Reserved.</span>
+      <span>Copyright@ZC Tech</span>
     </div>
   </div>
 </template>

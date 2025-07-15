@@ -509,6 +509,7 @@ function handleUpdate(row) {
     open.value = true
     title.value = "修改用户"
     form.password = ""
+    console.log('form.value',form.value)
   })
 }
 
