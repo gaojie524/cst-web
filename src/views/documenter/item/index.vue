@@ -11,9 +11,9 @@
         />
       </el-form-item>
 
-      <el-form-item label="物料单位" prop="unitId">
-        <el-select v-model="queryParams.unitId" placeholder="请选择物料单位" clearable style="width: 150px" filterable>
-          <el-option v-for="item in unitOptions" :key="item.unitId" :label="item.unitCode" :value="item.unitId"/>
+      <el-form-item label="物料单位" prop="unitCode">
+        <el-select v-model="queryParams.unitCode" placeholder="请选择物料单位" clearable style="width: 150px" filterable>
+          <el-option v-for="item in unitOptions" :key="item.unitCode" :label="item.unitCode" :value="item.unitCode"/>
         </el-select>
       </el-form-item>
       <el-form-item label="物料类别" prop="itemCategory">
@@ -91,9 +91,9 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="物料编号" align="center" prop="itemCode" width="200"/>
       <el-table-column label="物料名称" align="center" prop="itemName" />
-      <el-table-column label="物料单位" align="center" prop="unitId">
+      <el-table-column label="物料单位" align="center" prop="unitCode">
         <template #default="scope">
-          <span>{{ getUnitCode(scope.row.unitId) }}</span>
+          <span>{{ getUnitCode(scope.row.unitCode) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="物料类别" align="center" prop="itemCategory">
@@ -128,7 +128,6 @@
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="最后更新标识" align="center" prop="lastUpdateFlag" width="150"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="180">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['documenter:item:edit']">修改</el-button>
@@ -156,9 +155,9 @@
           </el-col>
 
           <el-col :span="12">
-            <el-form-item label="物料单位" prop="unitId">
-              <el-select v-model="form.unitId" placeholder="请选择物料单位" filterable>
-                <el-option v-for="item in unitOptions" :key="item.unitId" :label="item.unitCode" :value="item.unitId"/>
+            <el-form-item label="物料单位" prop="unitCode">
+              <el-select v-model="form.unitCode" placeholder="请选择物料单位" filterable>
+                <el-option v-for="item in unitOptions" :key="item.unitCode" :label="item.unitCode" :value="item.unitCode"/>
               </el-select>
             </el-form-item>
           </el-col>
@@ -298,7 +297,7 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     itemName: null,
-    unitId: null,
+    unitCode: null,
     itemCategory: null,
     itemStatus: null,
     creationMethod:null,
@@ -307,7 +306,7 @@ const data = reactive({
     itemName: [
       { required: true, message: "物料名称不能为空", trigger: "blur" }
     ],
-    unitId: [
+    unitCode: [
       { required: true, message: "物料单位不能为空", trigger: "change" }
     ],
     itemCategory: [
@@ -346,7 +345,7 @@ function reset() {
     itemId: null,
     itemCode: null,
     itemName: null,
-    unitId: null,
+    unitCode: null,
     itemCategory: null,
     itemStatus: null,
     creationMethod: null,
@@ -413,9 +412,7 @@ function submitForm() {
           getList()
         })
       } else {
-        //需要获取数据字典的值
         form.value.creationMethod = "0";
-        console.log('form',form);
         addItem(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功")
           open.value = false
@@ -452,7 +449,7 @@ function getUnitOptions() {
 }
 /** 转义单位列表 */
 function getUnitCode(value) {
-  const unit = unitOptions.value.find(option => {return option.unitId == value;});
+  const unit = unitOptions.value.find(option => {return option.unitCode == value;});
   return unit ? unit.unitCode : value;
 }
 /** 导入按钮操作 */
