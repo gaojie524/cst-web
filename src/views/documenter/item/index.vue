@@ -73,7 +73,7 @@
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="info" plain icon="Upload" @click="handleImport" v-hasPermi="['system:user:import']">导入</el-button>
+        <el-button type="info" plain icon="Upload" @click="handleImport" v-hasPermi="['documenter:item:import']">导入</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -367,7 +367,6 @@ function reset() {
 function handleQuery() {
   queryParams.value.pageNum = 1
   getList()
-  console.log('creation_method',creation_method);
 }
 
 /** 重置按钮操作 */
