@@ -290,6 +290,7 @@ const { queryParams, form, rules } = toRefs(data)
 
 /** 通过条件过滤节点  */
 const filterNode = (value, data) => {
+  console.log(111)
   if (!value) return true
   return data.label.indexOf(value) !== -1
 }

@@ -17,6 +17,7 @@ import directive from './directive' // directive
 // 注册指令
 import plugins from './plugins' // plugins
 import { download } from '@/utils/request'
+import components from '@/components/index'
 
 // svg图标
 import 'virtual:svg-icons-register'
@@ -57,6 +58,7 @@ app.config.globalProperties.getConfigKey = getConfigKey
 app.config.globalProperties.selectDictLabel = selectDictLabel
 app.config.globalProperties.selectDictLabels = selectDictLabels
 
+
 // 全局组件挂载
 app.component('DictTag', DictTag)
 app.component('Pagination', Pagination)
@@ -71,6 +73,7 @@ app.use(store)
 app.use(plugins)
 app.use(elementIcons)
 app.component('svg-icon', SvgIcon)
+app.use(components)
 
 directive(app)
 
@@ -82,3 +85,5 @@ app.use(ElementPlus, {
 })
 
 app.mount('#app')
+
+

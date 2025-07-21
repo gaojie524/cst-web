@@ -42,3 +42,5 @@ export function delHead(routeHeadId) {
     method: 'delete'
   })
 }
+
+
