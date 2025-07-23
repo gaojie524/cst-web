@@ -1,8 +1,8 @@
 {
   "name": "ruoyi",
   "version": "3.9.0",
-  "description": "云帆MES",
-  "author": "云帆EMS",
+  "description": "云工厂",
+  "author": "云工厂",
   "license": "MIT",
   "type": "module",
   "scripts": {

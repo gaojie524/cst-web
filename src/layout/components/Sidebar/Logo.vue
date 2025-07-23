@@ -6,8 +6,8 @@
         <h1 v-else class="sidebar-title">{{ title }}</h1>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <img v-if="logo" :src="logo" class="sidebar-logo" />
-        <h1 class="sidebar-title">{{ title }}</h1>
+        <img v-if="logo" :src="logo" class="sidebar-logo" style="height: 40px;width: 160px;" />
+        <h1 class="sidebar-title">{{ title }}1</h1>
       </router-link>
     </transition>
   </div>
@@ -94,4 +94,6 @@ const getLogoTextColor = computed(() => {
     }
   }
 }
+
+
 </style>

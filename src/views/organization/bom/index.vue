@@ -8,7 +8,7 @@
               <el-input v-model="itemCode" placeholder="请输入物料编号" clearable prefix-icon="Search" style="margin-bottom: 20px" />
             </div>
             <div class="head-container">
-              <el-tree :data="bomOptions" :props="{ label: 'label', children: 'children',bomHeadId:'parentId' }" :expand-on-click-node="false" :filter-node-method="filterNode" ref="bomTreeRef" node-key="id" highlight-current default-expand-all @node-click="handleNodeClick" />
+              <el-tree :data="bomOptions" :props="{ label: 'itemCode', children: 'children',bomHeadId:'parentId',bomLineId:'bomLineId' ,bomHeadLineId:'bomHeadLineId'}" :expand-on-click-node="false" :filter-node-method="filterNode" ref="bomTreeRef" node-key="id" highlight-current default-expand-all @node-click="handleNodeClick" />
             </div>
           </el-col>
         </pane>
@@ -71,7 +71,7 @@
                       v-hasPermi="['organization:bom:edit']"
                   >修改</el-button>
                 </el-col>
-                <el-col :span="1.5">
+                <el-col :span="1.5" v-if="bomData != null && bomData.bomStatus == 'Y'">
                   <el-button
                       type="danger"
                       plain
@@ -79,7 +79,17 @@
                       :disabled="multiple"
                       @click="handleDelete"
                       v-hasPermi="['organization:bom:remove']"
-                  >删除</el-button>
+                  >失效</el-button>
+                </el-col>
+                <el-col :span="1.5" v-if="bomData != null && bomData.bomStatus == 'N'">
+                  <el-button
+                      type="success"
+                      plain
+                      icon="Edit"
+                      :disabled="multiple"
+                      @click="upDateBomStatus"
+                      v-hasPermi="['organization:bom:remove']"
+                  >有效</el-button>
                 </el-col>
                 <el-col :span="1.5">
                   <el-button
@@ -194,16 +204,6 @@
         <el-form-item label="BOM版本号" prop="bomVersion">
           <el-input v-model="form.bomVersion" placeholder="请输入BOM版本号" />
         </el-form-item>
-        <el-form-item label="BOM状态" prop="bomStatus">
-          <el-select v-model="form.bomStatus" placeholder="请选择BOM状态">
-            <el-option
-              v-for="dict in bom_status"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            ></el-option>
-          </el-select>
-        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -249,7 +249,7 @@ const { bom_status,creation_method } = proxy.useDict('bom_status','creation_meth
 const appStore = useAppStore()
 const bomList = ref([])
 const open = ref(false)
-const loading = ref(true)
+const loading = ref(false)
 const showSearch = ref(true)
 const ids = ref([])
 const single = ref(true)
@@ -271,7 +271,9 @@ const singleBomLine = ref(true)
 const multipleBomLine = ref(true)
 const totalBomLine = ref(0)
 const titleBomLine = ref("")
-
+const bomHeadId = ref("")
+const parentItemId = ref("")
+const bomData = ref(null);
 const data = reactive({
   form: {
     parentItemId:null,
@@ -350,16 +352,29 @@ watch(itemCode, val => {
 /** 节点单击事件 */
 function handleNodeClick(data) {
   resetBomLine();
-  if (!data.parentId){
-    queryParams.value.bomHeadId = data.id
-    bomLineData.queryParams.bomHeadId = data.id
 
+  if (data.children.length > 0) {
+    queryParams.value.bomHeadId = data.bomHeadId
+    bomLineData.queryParams.bomHeadId = data.bomHeadId
+
+    handleQuery()
+    handleQueryBomLine();
+  }else if (data.bomLineId != null && data.children.length ==0) {
+    if (data.bomHeadLineId){
+      queryParams.value.bomHeadId = data.bomHeadLineId
+      bomHeadId.value = data.bomHeadId
+    }else {
+      queryParams.value.bomHeadId = data.bomHeadId
+    }
+      bomLineData.queryParams.bomLineId = data.bomLineId
+      handleQuery()
+      handleQueryBomLine();
   }else {
-    queryParams.value.bomHeadId = data.parentId
-    bomLineData.queryParams.bomLineId = data.id
+    queryParams.value.bomHeadId = data.bomHeadId
+    handleQuery()
+    bomLineList.value = [];
   }
-  handleQuery()
-  handleQueryBomLine();
+  parentItemId.value = data.parentItemId
 }
 /**重置 行表参数**/
 function  resetBomLine(){
@@ -371,6 +386,9 @@ function getList() {
   loading.value = true
   listBomHead(queryParams.value).then(response => {
     bomList.value = response.rows
+    if (response.rows.length > 0) {
+      bomData.value = response.rows[0]
+    }
     total.value = response.total
     loading.value = false
   })
@@ -416,6 +434,8 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   proxy.resetForm("queryRef")
+  queryParams.value.bomHeadId = null;
+  bomLineList.value = [];
   handleQuery()
 }``
 
@@ -446,6 +466,10 @@ function handleUpdate(row) {
 
 /** 提交按钮 */
 function submitForm() {
+  if (parentItemId.value == form.parentItemId){
+    proxy.$modal.msgWarning(`${form.parentItemId}不能添加在自己的bom行表内`)
+    return
+  }
   proxy.$refs["bomRef"].validate(valid => {
     if (valid) {
       if (form.value.bomHeadId != null) {
@@ -455,27 +479,37 @@ function submitForm() {
           getList()
         })
       } else {
+        form.value.bomStatus = 'Y';
         form.value.creationMethod = "0";
         addBomHead(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功")
           open.value = false
-          getList()
+          bomList.value = [];
+          getBomTree()
         })
       }
     }
   })
 }
 
-/** 删除按钮操作 */
-function handleDelete(row) {
-  const _bomHeadIds = row.bomHeadId || ids.value
-  proxy.$modal.confirm('是否确认删除BOM管理编号为"' + _bomHeadIds + '"的数据项？').then(function() {
-    return delBomHead(_bomHeadIds)
-  }).then(() => {
+/** 失效按钮操作 */
+function handleDelete() {
+  bomData.value.bomStatus = 'N';
+  updateBomHead(bomData.value).then(response => {
+    proxy.$modal.msgSuccess("修改成功")
     getList()
-    proxy.$modal.msgSuccess("删除成功")
-  }).catch(() => {})
+  })
 }
+
+/** 有效效按钮操作 */
+function upDateBomStatus() {
+  bomData.value.bomStatus = 'Y';
+  updateBomHead(bomData.value).then(response => {
+    proxy.$modal.msgSuccess("修改成功")
+    getList()
+  })
+}
+
 
 /** 导出按钮操作 */
 function handleExport() {
@@ -511,7 +545,6 @@ function getItemList() {
 /** 子组件 搜索 分页查询 */
 const getListPage = (data) => {
   itemData.queryParams = data;
-  console.log('data', data);
   getItemList();
 };
 
@@ -542,11 +575,6 @@ function handleQueryBomLine() {
   getBomLineList()
 }
 
-/** 重置按钮操作 */
-function resetQueryBomLine() {
-  proxy.resetForm("queryRef")
-  handleQuery()
-}
 
 
 // 多选框选中数据
@@ -562,7 +590,12 @@ function handleAddBomLine() {
     proxy.$modal.msgWarning("请先选择上级BOM节点")
     return
   }
-  bomLineData.form.bomHeadId = queryParams.value.bomHeadId
+  if (bomHeadId.value){
+    bomLineData.form.bomHeadId = bomHeadId.value
+  }else {
+    bomLineData.form.bomHeadId = queryParams.value.bomHeadId
+  }
+
   openBomLine.value = true
   titleBomLine.value = "添加BOM行"
 }
@@ -579,6 +612,10 @@ function handleUpdateBomLine(row) {
 
 /** 提交按钮 */
 function submitFormBomLine() {
+  if (parentItemId.value == bomLineData.form.childItemId){
+    proxy.$modal.msgWarning(`${bomLineData.form.childItemId}不能添加在自己的bom行表内`)
+    return
+  }
   proxy.$refs["bomLineRef"].validate(valid => {
     if (valid) {
       if (bomLineData.form.bomLineId != null) {
@@ -591,7 +628,8 @@ function submitFormBomLine() {
         addBomLine(bomLineData.form).then(response => {
           proxy.$modal.msgSuccess("新增成功")
           openBomLine.value = false
-          getBomLineList()
+          bomLineList.value = [];
+          getBomTree();
         })
       }
     }
@@ -604,7 +642,7 @@ function handleDeleteBomLine(row) {
   proxy.$modal.confirm('是否确认删除BOM行编号为"' + _bomLineIds + '"的数据项？').then(function() {
     return delBomLine(_bomLineIds)
   }).then(() => {
-    getBomLineList()
+    getBomTree()
     proxy.$modal.msgSuccess("删除成功")
   }).catch(() => {})
 }
@@ -619,7 +657,6 @@ function handleExportBomLine() {
 
 onMounted(() => {
   getBomTree()
-  getList()
 })
 </script>
 <style lang="scss" scoped>

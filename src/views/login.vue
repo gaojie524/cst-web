@@ -59,7 +59,7 @@
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
-      <span>Copyright@ZC Tech</span>
+      <span>Copyright@联通东莞产互</span>
     </div>
   </div>
 </template>
