@@ -1,9 +1,9 @@
-import request from '@/utils/request'
+import request from '@/utils/request.js'
 
 // 查询工艺路线头列表
 export function listHead(query) {
   return request({
-    url: '/organization/head/list',
+    url: '/documenter/head/list',
     method: 'get',
     params: query
   })
@@ -12,7 +12,7 @@ export function listHead(query) {
 // 查询工艺路线头详细
 export function getHead(routeHeadId) {
   return request({
-    url: '/organization/head/' + routeHeadId,
+    url: '/documenter/head/' + routeHeadId,
     method: 'get'
   })
 }
@@ -20,7 +20,7 @@ export function getHead(routeHeadId) {
 // 新增工艺路线头
 export function addHead(data) {
   return request({
-    url: '/organization/head',
+    url: '/documenter/head',
     method: 'post',
     data: data
   })
@@ -29,7 +29,7 @@ export function addHead(data) {
 // 修改工艺路线头
 export function updateHead(data) {
   return request({
-    url: '/organization/head',
+    url: '/documenter/head',
     method: 'put',
     data: data
   })
@@ -38,7 +38,7 @@ export function updateHead(data) {
 // 删除工艺路线头
 export function delHead(routeHeadId) {
   return request({
-    url: '/organization/head/' + routeHeadId,
+    url: '/documenter/head/' + routeHeadId,
     method: 'delete'
   })
 }

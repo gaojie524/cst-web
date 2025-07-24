@@ -41,7 +41,7 @@
           plain
           icon="Plus"
           @click="handleAdd"
-          v-hasPermi="['organization:routeHead:add']"
+          v-hasPermi="['documenter:routeHead:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -51,7 +51,7 @@
           icon="Edit"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['organization:routeHead:edit']"
+          v-hasPermi="['documenter:routeHead:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -61,7 +61,7 @@
           icon="Delete"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['organization:routeHead:remove']"
+          v-hasPermi="['documenter:routeHead:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -70,7 +70,7 @@
           plain
           icon="Download"
           @click="handleExport"
-          v-hasPermi="['organization:routeHead:export']"
+          v-hasPermi="['documenter:routeHead:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
@@ -91,11 +91,6 @@
           <dict-tag :options="creation_method" :value="scope.row.creationMethod"/>
         </template>
       </el-table-column>
-      <el-table-column label="备注1" align="center" prop="remark1" />
-      <el-table-column label="备注2" align="center" prop="remark2" />
-      <el-table-column label="备注3" align="center" prop="remark3" />
-      <el-table-column label="备注4" align="center" prop="remark4" />
-      <el-table-column label="备注5" align="center" prop="remark5" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
@@ -109,8 +104,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="180">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['organization:routeHead:edit']">修改</el-button>
-          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['organization:routeHead:remove']">删除</el-button>
+          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['documenter:routeHead:edit']">修改</el-button>
+          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['documenter:routeHead:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -188,8 +183,8 @@
   </div>
 </template>
 
-<script setup name="routeHead">
-import { listHead, getHead, delHead, addHead, updateHead } from "@/api/organization/head"
+<script setup name="route">
+import { listHead, getHead, delHead, addHead, updateHead } from "@/api/documenter/routeHead"
 
 const { proxy } = getCurrentInstance()
 const { route_status, creation_method } = proxy.useDict('route_status', 'creation_method')
@@ -357,7 +352,7 @@ function handleDelete(row) {
 
 /** 导出按钮操作 */
 function handleExport() {
-  proxy.download('organization/head/export', {
+  proxy.download('documenter/head/export', {
     ...queryParams.value
   }, `head_${new Date().getTime()}.xlsx`)
 }

@@ -80,17 +80,17 @@
           <dict-tag :options="process_status" :value="scope.row.processStatus"/>
         </template>
       </el-table-column>
+      <el-table-column label="一级标准时间(分钟)" align="center" prop="oneLevelStandardTime" width="180"/>
+      <el-table-column label="一级责任人" align="center" prop="oneLevelPersonChargeName" width="150"/>
+      <el-table-column label="二级标准时间(分钟)" align="center" prop="twoLevelStandardTime" width="180"/>
+      <el-table-column label="二级责任人" align="center" prop="twoLevelPersonChargeName" width="150"/>
+      <el-table-column label="三级标准时间(分钟)" align="center" prop="threeLevelStandardTime" width="180"/>
+      <el-table-column label="三级责任人" align="center" prop="threeLevelPersonChargeName" width="150"/>
       <el-table-column label="创建方式" align="center" prop="creationMethod">
         <template #default="scope">
           <dict-tag :options="creation_method" :value="scope.row.creationMethod"/>
         </template>
       </el-table-column>
-      <el-table-column label="备注1" align="center" prop="remark1" />
-      <el-table-column label="备注2" align="center" prop="remark2" />
-      <el-table-column label="备注3" align="center" prop="remark3" />
-      <el-table-column label="备注4" align="center" prop="remark4" />
-      <el-table-column label="备注5" align="center" prop="remark5" />
-      <el-table-column label="创建人" align="center" prop="createBy" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -102,7 +102,7 @@
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="最后更新标识" align="center" prop="lastUpdateFlag" width="120"/>
+
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="180">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['documenter:process:edit']">修改</el-button>
@@ -110,7 +110,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -121,13 +121,21 @@
 
     <!-- 添加或修改工序对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="processRef" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="processRef" :model="form" :rules="rules" label-width="110px">
         <el-row>
+          <el-col :span="12">
+            <el-form-item label="工序编号" prop="processCode">
+              <el-input v-model="form.processCode" placeholder="请输入工序名称" />
+            </el-form-item>
+          </el-col>
           <el-col :span="12">
             <el-form-item label="工序名称" prop="processName">
               <el-input v-model="form.processName" placeholder="请输入工序名称" />
             </el-form-item>
           </el-col>
+        </el-row>
+
+        <el-row>
           <el-col :span="12">
             <el-form-item label="工序状态" prop="processStatus">
               <el-select v-model="form.processStatus" placeholder="请选择工序状态">
@@ -140,46 +148,67 @@
               </el-select>
             </el-form-item>
           </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="24">
+          <el-col :span="12">
             <el-form-item label="工序描述" prop="processDesc">
               <el-input v-model="form.processDesc"  placeholder="请输入内容" />
             </el-form-item>
           </el-col>
         </el-row>
-
         <el-row>
           <el-col :span="12">
-            <el-form-item label="备注1" prop="remark1">
-              <el-input v-model="form.remark1" placeholder="请输入备注1" />
+            <el-form-item label="一级标准时间" prop="oneLevelStandardTime">
+              <el-input-number
+                  v-model="form.oneLevelStandardTime"
+                  placeholder="请输入(分钟)"
+                  :min="0"
+                  style="width: 100%;"
+                  >
+              </el-input-number>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="备注2" prop="remark2">
-              <el-input v-model="form.remark2" placeholder="请输入备注2" />
+            <el-form-item label="一级责任人" prop="oneLevelPersonChargeName">
+              <el-input v-model="form.oneLevelPersonChargeName" placeholder="请选择" @click="handleFormUserClick" :readonly="true"/>
+              <zc-user-select ref="zcUserSelectOneRef" @sendData="zcUserSelectOne"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="二级标准时间" prop="twoLevelStandardTime">
+              <el-input-number
+                  v-model="form.twoLevelStandardTime"
+                  placeholder="请输入(分钟)"
+                  :min="0"
+                  style="width: 100%;"
+              >
+              </el-input-number>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="二级责任人" prop="twoLevelPersonChargeName">
+              <el-input v-model="form.twoLevelPersonChargeName" placeholder="请选择" @click="handleFormUserClickTow" :readonly="true"/>
+              <zc-user-select ref="zcUserSelectTwoRef" @sendData="zcUserSelectTwo"/>
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="12">
-            <el-form-item label="备注3" prop="remark3">
-              <el-input v-model="form.remark3" placeholder="请输入备注3" />
+            <el-form-item label="三级标准时间" prop="threeLevelStandardTime">
+              <el-input-number
+                  v-model="form.threeLevelStandardTime"
+                  placeholder="请输入(分钟)"
+                  :min="0"
+                  style="width: 100%;"
+              >
+              </el-input-number>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="备注4" prop="remark4">
-              <el-input v-model="form.remark4" placeholder="请输入备注4" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="备注5" prop="remark5">
-              <el-input v-model="form.remark5" placeholder="请输入备注5" />
+            <el-form-item label="三级责任人" prop="threeLevelPersonChargeName">
+              <el-input v-model="form.threeLevelPersonChargeName" placeholder="请选择" @click="handleFormUserClickThree" :readonly="true"/>
+              <zc-user-select ref="zcUserSelectThreeRef" @sendData="zcUserSelectThree"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -219,7 +248,7 @@
 <script setup name="Process">
 import { listProcess, getProcess, delProcess, addProcess, updateProcess } from "@/api/documenter/process"
 import { getToken } from "@/utils/auth"
-
+import zcUserSelect from "@/components/zc/zcUserSelect.vue";
 const { proxy } = getCurrentInstance()
 const { process_status, creation_method } = proxy.useDict('process_status', 'creation_method')
 
@@ -232,6 +261,10 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
+const zcUserSelectOneRef = ref(null);
+const zcUserSelectTwoRef = ref(null);
+const zcUserSelectThreeRef = ref(null);
+
 /*** 工序导入参数 */
 const upload = reactive({
   // 是否显示弹出层（工序导入）
@@ -255,20 +288,42 @@ const data = reactive({
     processName: null,
     processDesc: null,
     processStatus: null,
+    oneLevelStandardTime:null,
+    oneLevelPersonCharge:null,
+    oneLevelPersonChargeName:null,
+    twoLevelStandardTime:null,
+    twoLevelPersonCharge:null,
+    twoLevelPersonChargeName:null,
+    threeLevelStandardTime:null,
+    threeLevelPersonCharge:null,
+    threeLevelPersonChargeName:null,
   },
   rules: {
+    processCode: [
+      { required: true, message: "工序编号不能为空", trigger: "change" }
+    ],
     processStatus: [
       { required: true, message: "工序状态不能为空", trigger: "change" }
     ],
-    creationMethod: [
-      { required: true, message: "创建方式不能为空", trigger: "change" }
+    oneLevelStandardTime: [
+      { required: true, message: "一级标准时间不能为空", trigger: "change" }
     ],
-    createTime: [
-      { required: true, message: "创建时间不能为空", trigger: "blur" }
+    oneLevelPersonChargeName: [
+      { required: true, message: "一级责任人不能为空", trigger: "change" }
     ],
-    updateTime: [
-      { required: true, message: "最后更新时间不能为空", trigger: "blur" }
+    twoLevelStandardTime: [
+      { required: true, message: "二级标准时间不能为空", trigger: "change" }
     ],
+    twoLevelPersonChargeName: [
+      { required: true, message: "二级责任人不能为空", trigger: "change" }
+    ],
+   threeLevelStandardTime: [
+      { required: true, message: "三级标准时间不能为空", trigger: "change" }
+    ],
+    threeLevelPersonChargeName: [
+      { required: true, message: "三级责任人不能为空", trigger: "change" }
+    ],
+
   }
 })
 
@@ -418,6 +473,33 @@ const handleFileSuccess = (response, file, fileList) => {
 /** 提交上传文件 */
 function submitFileForm() {
   proxy.$refs["uploadRef"].submit()
+}
+/** 打开用户选择组件 */
+function  handleFormUserClick(){
+  zcUserSelectOneRef.value.showDialog();
+}
+
+function  handleFormUserClickTow(){
+  zcUserSelectTwoRef.value.showDialog();
+}
+function  handleFormUserClickThree(){
+  zcUserSelectThreeRef.value.showDialog();
+}
+
+
+const zcUserSelectOne = (data) => {
+  form.value.oneLevelPersonCharge = data.userId;
+  form.value.oneLevelPersonChargeName = data.userName;
+}
+
+const zcUserSelectTwo = (data) => {
+  form.value.twoLevelPersonCharge = data.userId;
+  form.value.twoLevelPersonChargeName = data.userName;
+}
+
+const zcUserSelectThree = (data) => {
+  form.value.threeLevelPersonCharge = data.userId;
+  form.value.threeLevelPersonChargeName = data.userName;
 }
 getList()
 </script>

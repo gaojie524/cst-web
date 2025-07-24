@@ -106,7 +106,6 @@ export default {
 
     },
     submitForm(){
-      console.log('333',this.rowData)
       this.$emit('sendData', this.rowData);
       this.open = false;
     },
