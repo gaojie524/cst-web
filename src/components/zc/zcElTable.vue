@@ -1,6 +1,6 @@
 <template>
 
-  <el-dialog :title="title" :model-value="open" width="800px" append-to-body>
+  <el-dialog :title="title" v-model="open" width="800px" append-to-body>
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="查询条件" prop="itemName" >
         <el-input

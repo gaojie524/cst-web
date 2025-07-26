@@ -3,7 +3,7 @@ import request from '@/utils/request.js'
 // 查询工艺路线头列表
 export function listHead(query) {
   return request({
-    url: '/documenter/head/list',
+    url: '/documenter/routeHead/list',
     method: 'get',
     params: query
   })
@@ -12,7 +12,7 @@ export function listHead(query) {
 // 查询工艺路线头详细
 export function getHead(routeHeadId) {
   return request({
-    url: '/documenter/head/' + routeHeadId,
+    url: '/documenter/routeHead/' + routeHeadId,
     method: 'get'
   })
 }
@@ -20,7 +20,7 @@ export function getHead(routeHeadId) {
 // 新增工艺路线头
 export function addHead(data) {
   return request({
-    url: '/documenter/head',
+    url: '/documenter/routeHead',
     method: 'post',
     data: data
   })
@@ -29,7 +29,7 @@ export function addHead(data) {
 // 修改工艺路线头
 export function updateHead(data) {
   return request({
-    url: '/documenter/head',
+    url: '/documenter/routeHead',
     method: 'put',
     data: data
   })
@@ -38,8 +38,22 @@ export function updateHead(data) {
 // 删除工艺路线头
 export function delHead(routeHeadId) {
   return request({
-    url: '/documenter/head/' + routeHeadId,
+    url: '/documenter/routeHead/' + routeHeadId,
     method: 'delete'
+  })
+}
+
+// 用户状态修改
+export function changeUserStatus(routeHeadId, status,routeSmallVersion) {
+  const data = {
+    routeHeadId,
+    status,
+    routeSmallVersion
+  }
+  return request({
+    url: '/documenter/routeHead/changeStatus',
+    method: 'put',
+    data: data
   })
 }
 

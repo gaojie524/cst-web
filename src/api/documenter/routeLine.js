@@ -1,4 +1,4 @@
-import request from '@/utils/request.js'
+import request from '@/utils/request'
 
 // 查询工艺路线行列表
 export function listRouteLine(query) {

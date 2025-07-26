@@ -80,11 +80,11 @@
           <dict-tag :options="process_status" :value="scope.row.processStatus"/>
         </template>
       </el-table-column>
-      <el-table-column label="一级标准时间(分钟)" align="center" prop="oneLevelStandardTime" width="180"/>
+      <el-table-column label="一级标准时间(H)" align="center" prop="oneLevelStandardTime" width="180"/>
       <el-table-column label="一级责任人" align="center" prop="oneLevelPersonChargeName" width="150"/>
-      <el-table-column label="二级标准时间(分钟)" align="center" prop="twoLevelStandardTime" width="180"/>
+      <el-table-column label="二级标准时间(H)" align="center" prop="twoLevelStandardTime" width="180"/>
       <el-table-column label="二级责任人" align="center" prop="twoLevelPersonChargeName" width="150"/>
-      <el-table-column label="三级标准时间(分钟)" align="center" prop="threeLevelStandardTime" width="180"/>
+      <el-table-column label="三级标准时间(H)" align="center" prop="threeLevelStandardTime" width="180"/>
       <el-table-column label="三级责任人" align="center" prop="threeLevelPersonChargeName" width="150"/>
       <el-table-column label="创建方式" align="center" prop="creationMethod">
         <template #default="scope">
@@ -159,8 +159,8 @@
             <el-form-item label="一级标准时间" prop="oneLevelStandardTime">
               <el-input-number
                   v-model="form.oneLevelStandardTime"
-                  placeholder="请输入(分钟)"
-                  :min="0"
+                  placeholder="请输入(小时)"
+                  :min="1"
                   style="width: 100%;"
                   >
               </el-input-number>
@@ -178,8 +178,8 @@
             <el-form-item label="二级标准时间" prop="twoLevelStandardTime">
               <el-input-number
                   v-model="form.twoLevelStandardTime"
-                  placeholder="请输入(分钟)"
-                  :min="0"
+                  placeholder="请输入(小时)"
+                  :min="1"
                   style="width: 100%;"
               >
               </el-input-number>
@@ -198,8 +198,8 @@
             <el-form-item label="三级标准时间" prop="threeLevelStandardTime">
               <el-input-number
                   v-model="form.threeLevelStandardTime"
-                  placeholder="请输入(分钟)"
-                  :min="0"
+                  placeholder="请输入(小时)"
+                  :min="1"
                   style="width: 100%;"
               >
               </el-input-number>
@@ -285,18 +285,18 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    processName: null,
-    processDesc: null,
-    processStatus: null,
-    oneLevelStandardTime:null,
-    oneLevelPersonCharge:null,
-    oneLevelPersonChargeName:null,
-    twoLevelStandardTime:null,
-    twoLevelPersonCharge:null,
-    twoLevelPersonChargeName:null,
-    threeLevelStandardTime:null,
-    threeLevelPersonCharge:null,
-    threeLevelPersonChargeName:null,
+    // processName: null,
+    // processDesc: null,
+    // processStatus: null,
+    // oneLevelStandardTime:null,
+    // oneLevelPersonCharge:null,
+    // oneLevelPersonChargeName:null,
+    // twoLevelStandardTime:null,
+    // twoLevelPersonCharge:null,
+    // twoLevelPersonChargeName:null,
+    // threeLevelStandardTime:null,
+    // threeLevelPersonCharge:null,
+    // threeLevelPersonChargeName:null,
   },
   rules: {
     processCode: [
